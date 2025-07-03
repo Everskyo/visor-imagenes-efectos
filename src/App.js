@@ -53,13 +53,10 @@ function ZoomableImage({ src, filter }) {
     if (!img || !canvas) return;
 
     const ctx = canvas.getContext("2d");
-
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Filtros canvas
     switch (filter) {
       case "grayscale":
         ctx.filter = "grayscale(100%)";
@@ -72,10 +69,8 @@ function ZoomableImage({ src, filter }) {
     }
 
     ctx.save();
-    // Ajustamos escala y posición para reflejar zoom y desplazamiento
     ctx.scale(scale, scale);
     ctx.translate(pos.x / scale, pos.y / scale);
-
     ctx.drawImage(img, 0, 0);
     ctx.restore();
 
@@ -86,41 +81,63 @@ function ZoomableImage({ src, filter }) {
   };
 
   return (
-    <div
-      className="card"
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      style={{ cursor: scale > 1 ? "grab" : "default" }}
-    >
-      <img
-        ref={imgRef}
-        src={src}
-        alt="zoomable"
-        className={filter}
-        style={{
-          transform: `scale(${scale}) translate(${pos.x / scale}px, ${pos.y / scale}px)`,
-          transition: dragging.current ? "none" : "transform 0.15s ease-out",
-          userSelect: "none",
-          pointerEvents: "all",
-          display: "block",
-          width: "100%",
-          height: "auto",
-          borderRadius: "12px",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.3)",
-        }}
-        draggable={false}
-      />
-      <button
-        onClick={downloadImage}
-        className="btn-download"
-        aria-label="Descargar imagen"
+    <div className="card-container">
+      <div
+        className="card"
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ cursor: scale > 1 ? "grab" : "default" }}
       >
-        Descargar
-      </button>
-      <canvas ref={canvasRef} style={{ display: "none" }} />
+        <img
+          ref={imgRef}
+          src={src}
+          alt="zoomable"
+          className={filter}
+          style={{
+            transform: `scale(${scale}) translate(${pos.x / scale}px, ${pos.y / scale}px)`,
+            transition: dragging.current ? "none" : "transform 0.15s ease-out",
+            userSelect: "none",
+            pointerEvents: "all",
+            display: "block",
+            width: "100%",
+            height: "auto",
+            borderRadius: "12px",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.3)",
+          }}
+          draggable={false}
+        />
+        <button
+          onClick={downloadImage}
+          className="btn-download"
+          aria-label="Descargar imagen"
+        >
+          Descargar
+        </button>
+        <canvas ref={canvasRef} style={{ display: "none" }} />
+      </div>
+
+      <div className="zoom-buttons">
+        <button onClick={() => setScale((prev) => Math.min(prev + 0.25, 3))}>
+          Zoom +
+        </button>
+        <button
+          onClick={() => {
+            setScale((prev) => {
+              const newScale = Math.max(prev - 0.25, 1);
+              if (newScale === 1) {
+                setPos({ x: 0, y: 0 });
+                lastPos.current = { x: 0, y: 0 };
+              }
+              return newScale;
+            });
+          }}
+        >
+          Zoom -
+        </button>
+      </div>
     </div>
   );
 }
@@ -178,7 +195,9 @@ function App() {
         {images.length === 0 ? (
           <p className="empty-msg">No has subido ninguna imagen.</p>
         ) : (
-          images.map((src, i) => <ZoomableImage key={i} src={src} filter={filter} />)
+          images.map((src, i) => (
+            <ZoomableImage key={i} src={src} filter={filter} />
+          ))
         )}
       </main>
 

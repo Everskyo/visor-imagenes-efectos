@@ -176,3 +176,35 @@ body, html, #root {
 .sepia {
   filter: sepia(100%);
 }
+
+/* Nuevo contenedor para la tarjeta + botones de zoom */
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Botones de Zoom debajo de la imagen */
+.zoom-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.zoom-buttons button {
+  background: #4a90e2;
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.zoom-buttons button:hover {
+  background: #357ABD;
+}
+
